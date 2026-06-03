@@ -11,7 +11,7 @@
                     Panel Administrativo
                 </h1>
                 <div class="flex items-center gap-2 mt-1">
-                    <p class="text-gray-400 text-sm italic">{{ auth()->user()->barbershop->name }}</p>
+                    <p class="text-gray-400 text-sm italic">{{ auth()->user()->barbershop->name ?? 'Sin Barbería' }}</p>
                     @php
                         $planColors = [
                             'basic' => 'bg-gray-800 text-gray-400 border-gray-700',
