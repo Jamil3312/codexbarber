@@ -28,7 +28,7 @@ Route::get('/acceso-profesional', function () {
 
 // Tenant Public Landing
 Route::get('/b/{slug}', [PublicSaaSController::class, 'tenantLanding'])->name('tenant.landing');
-Route::get('/b/{slug}/manifest.json', [PublicSaaSController::class, 'tenantManifest'])->name('tenant.manifest');
+Route::get('/b/{slug}/pwa-manifest', [PublicSaaSController::class, 'tenantManifest'])->name('tenant.manifest');
 
 Route::get('/dashboard', function () {
     $user = auth()->user();
