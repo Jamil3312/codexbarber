@@ -46,7 +46,7 @@
                             </span>
                         @endif
                     </button>
-                    <div class="absolute right-0 mt-3 w-[calc(100vw-2rem)] max-w-sm sm:w-80 bg-gray-900 border border-gray-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all z-[100] origin-top-right">
+                    <div class="absolute left-0 sm:left-auto sm:right-0 mt-3 w-[calc(100vw-2rem)] max-w-sm sm:w-80 bg-gray-900 border border-gray-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all z-[100] origin-top-left sm:origin-top-right">
                         <div class="p-3 bg-gray-800/50 border-b border-gray-800 flex justify-between items-center rounded-t-3xl">
                             <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Actividad Reciente</span>
                             @if($unreadCount > 0)
