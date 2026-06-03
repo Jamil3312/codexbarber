@@ -27,7 +27,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="w-full md:w-auto flex justify-between md:justify-end items-center gap-3 mt-2 md:mt-0">
                 {{-- Botón Nueva Cita --}}
                 <button @click="walkinOpen = true"
                         class="bg-primary-dynamic text-gray-900 font-black px-4 py-2.5 rounded-2xl transition-all flex items-center gap-2 hover:-translate-y-0.5 active:scale-95 text-sm" style="box-shadow: 0 8px 20px var(--primary-glow); filter: brightness(1.1);">
