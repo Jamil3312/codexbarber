@@ -12,7 +12,17 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- PWA Setup -->
-        <link rel="manifest" href="{{ asset('manifest.json') }}">
+        @php
+            $manifestUrl = asset('manifest.json');
+            if (isset($barbershop)) {
+                $manifestUrl = route('tenant.manifest', ['slug' => $barbershop->slug]);
+            } elseif (session()->has('tenant_slug')) {
+                $manifestUrl = route('tenant.manifest', ['slug' => session('tenant_slug')]);
+            } elseif (auth()->check() && auth()->user()->barbershop) {
+                $manifestUrl = route('tenant.manifest', ['slug' => auth()->user()->barbershop->slug]);
+            }
+        @endphp
+        <link rel="manifest" href="{{ $manifestUrl }}">
         <meta name="theme-color" content="#eab308">
         <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23030712'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='200' font-family='sans-serif' font-weight='bold' fill='%23eab308'>RD</text></svg>">
         
