@@ -24,7 +24,13 @@
         @endphp
         <link rel="manifest" href="{{ $manifestUrl }}">
         <meta name="theme-color" content="#eab308">
-        <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23030712'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='200' font-family='sans-serif' font-weight='bold' fill='%23eab308'>RD</text></svg>">
+        @php
+            $appleIconText = isset($barbershop) ? strtoupper(substr($barbershop->name, 0, 2)) : (auth()->check() && auth()->user()->barbershop ? strtoupper(substr(auth()->user()->barbershop->name, 0, 2)) : 'RD');
+            $appleColorHex = isset($barbershop) && $barbershop->primary_color ? $barbershop->primary_color : (auth()->check() && auth()->user()->barbershop ? auth()->user()->barbershop->primary_color : '#eab308');
+            if ($appleColorHex === 'yellow-500') $appleColorHex = '#eab308';
+            $appleIconColor = str_replace('#', '%23', $appleColorHex);
+        @endphp
+        <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23030712'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='200' font-family='sans-serif' font-weight='bold' fill='{{ $appleIconColor }}'>{{ $appleIconText }}</text></svg>">
         
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
