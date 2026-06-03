@@ -36,8 +36,8 @@
                 </button>
 
                 {{-- Campana de Notificaciones --}}
-                <div class="relative group">
-                    <button wire:click="markNotificationsAsRead" class="flex items-center justify-center bg-gray-800/80 hover:bg-gray-700 p-3 rounded-2xl border border-gray-700 transition-all relative">
+                <div class="relative" x-data="{ openNotif: false }" @click.away="openNotif = false">
+                    <button @click="openNotif = !openNotif; if(openNotif && $wire.unreadCount > 0) $wire.markNotificationsAsRead()" class="flex items-center justify-center bg-gray-800/80 hover:bg-gray-700 p-3 rounded-2xl border border-gray-700 transition-all relative">
                         <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                         @if($unreadCount > 0)
                             <span class="absolute -top-1 -right-1 flex h-4 w-4">
@@ -46,7 +46,15 @@
                             </span>
                         @endif
                     </button>
-                    <div class="absolute left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-0 mt-3 w-80 max-w-[90vw] bg-gray-900 border border-gray-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all z-[100] origin-top">
+                    
+                    <div x-show="openNotif" style="display: none;"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="absolute left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-0 mt-3 w-80 max-w-[90vw] bg-gray-900 border border-gray-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-[100] origin-top">
                         <div class="p-3 bg-gray-800/50 border-b border-gray-800 flex justify-between items-center rounded-t-3xl">
                             <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Actividad Reciente</span>
                             @if($unreadCount > 0)
