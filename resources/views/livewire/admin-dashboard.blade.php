@@ -27,7 +27,7 @@
                 </div>
             </div>
 
-            <div class="w-full md:w-auto flex justify-between md:justify-end items-center gap-3 mt-2 md:mt-0">
+            <div class="w-full md:w-auto flex justify-center md:justify-end items-center gap-6 mt-4 md:mt-0">
                 {{-- Botón Nueva Cita --}}
                 <button @click="walkinOpen = true"
                         class="bg-primary-dynamic text-gray-900 font-black px-4 py-2.5 rounded-2xl transition-all flex items-center gap-2 hover:-translate-y-0.5 active:scale-95 text-sm" style="box-shadow: 0 8px 20px var(--primary-glow); filter: brightness(1.1);">
@@ -46,7 +46,7 @@
                             </span>
                         @endif
                     </button>
-                    <div class="absolute left-0 sm:left-auto sm:right-0 mt-3 w-[calc(100vw-2rem)] max-w-sm sm:w-80 bg-gray-900 border border-gray-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all z-[100] origin-top-left sm:origin-top-right">
+                    <div class="absolute left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-0 mt-3 w-80 max-w-[90vw] bg-gray-900 border border-gray-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all z-[100] origin-top">
                         <div class="p-3 bg-gray-800/50 border-b border-gray-800 flex justify-between items-center rounded-t-3xl">
                             <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Actividad Reciente</span>
                             @if($unreadCount > 0)
