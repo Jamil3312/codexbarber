@@ -31,6 +31,7 @@ class IsolateSuperadminSeeder extends Seeder
                     'password' => Hash::make('password'),
                     'phone' => '12345678',
                     'is_barber' => true,
+                    'is_owner' => true,
                     'is_superadmin' => false,
                     'barbershop_id' => $shop->id
                 ]
