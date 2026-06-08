@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notification;
 use App\Models\Appointment;
 use Carbon\Carbon;
 
-class AppointmentReminder extends Notification
+class AppointmentReminder extends Notification implements ShouldQueue
 {
     use Queueable;
 
