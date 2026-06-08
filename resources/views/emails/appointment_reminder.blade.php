@@ -77,22 +77,6 @@
         .highlight {
             color: #eab308;
         }
-        .button-container {
-            text-align: center;
-            margin: 40px 0 20px;
-        }
-        .button {
-            display: inline-block;
-            background-color: #eab308;
-            color: #000000 !important;
-            text-decoration: none;
-            padding: 16px 32px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
         .footer {
             text-align: center;
             padding: 30px;
@@ -110,6 +94,13 @@
             text-align: center;
             margin-top: 20px;
         }
+        .app-link-text {
+            text-align: center;
+            margin: 30px 0 10px;
+            color: #eab308;
+            font-weight: 600;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -123,7 +114,7 @@
                 <div class="greeting">¡Hola, {{ $clientName }}!</div>
                 
                 <p style="color: #d1d5db; font-size: 16px; line-height: 1.6;">
-                    Este es un recordatorio amigable de que tienes una cita programada para el día de <strong style="color: #ffffff;">hoy</strong> en nuestra barbería.
+                    Este es un recordatorio amigable de que tienes una cita programada para el día de <strong style="color: #ffffff;">hoy</strong>.
                 </p>
                 
                 <div class="details-card">
@@ -132,8 +123,8 @@
                         <div class="detail-value highlight" style="font-size: 24px;">{{ $time }}</div>
                     </div>
                     <div class="detail-item" style="margin-top: 20px;">
-                        <div class="detail-label">Servicio reservado</div>
-                        <div class="detail-value">{{ $serviceName }}</div>
+                        <div class="detail-label">Servicio</div>
+                        <div class="detail-value">{{ $serviceName ?? 'Servicio Reservado' }}</div>
                     </div>
                 </div>
                 
@@ -141,8 +132,8 @@
                     <strong>Importante:</strong> Te pedimos amablemente llegar con 5 a 10 minutos de anticipación para garantizarte el mejor servicio y respetar el tiempo de todos nuestros clientes.
                 </div>
                 
-                <div class="button-container">
-                    <a href="{{ $url }}" class="button">Ver Detalles de la Cita</a>
+                <div class="app-link-text">
+                    📱 Visualiza todos los detalles de tu cita en nuestra App.
                 </div>
             </div>
             
