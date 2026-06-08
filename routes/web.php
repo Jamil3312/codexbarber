@@ -17,6 +17,22 @@ use App\Http\Controllers\PublicSaaSController;
 */
 
 // SaaS Global Landing
+Route::get('/test-email', function (\Illuminate\Http\Request $request) {
+    if (!$request->has('email')) {
+        return "Por favor agrega tu correo a la URL, ejemplo: /test-email?email=tu-correo@gmail.com";
+    }
+    
+    try {
+        \Illuminate\Support\Facades\Mail::raw('¡Felicidades! Si estás leyendo esto, significa que el sistema SMTP de CodexBarber está configurado correctamente en Hostinger y listo para enviar los recordatorios de las citas automáticamente.', function ($message) use ($request) {
+            $message->to($request->email)
+                    ->subject('Prueba de Correos CodexBarber');
+        });
+        return "¡Correo enviado con éxito a {$request->email}! Revisa tu bandeja de entrada o la carpeta de Spam.";
+    } catch (\Exception $e) {
+        return "Hubo un error al enviar el correo. Revisa el archivo .env. Error exacto: " . $e->getMessage();
+    }
+});
+
 Route::get('/', [PublicSaaSController::class, 'globalLanding'])->name('home');
 
 // Acceso Profesional desde la landing global (limpia contexto de tenant)
