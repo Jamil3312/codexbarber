@@ -23,11 +23,17 @@ Route::get('/test-email', function (\Illuminate\Http\Request $request) {
     }
     
     try {
-        \Illuminate\Support\Facades\Mail::raw('¡Felicidades! Si estás leyendo esto, significa que el sistema SMTP de CodexBarber está configurado correctamente en Hostinger y listo para enviar los recordatorios de las citas automáticamente.', function ($message) use ($request) {
+        \Illuminate\Support\Facades\Mail::send('emails.appointment_reminder', [
+            'barbershopName' => 'RD Barber Studio',
+            'time' => '05:30 PM',
+            'clientName' => 'Cristofer',
+            'serviceName' => 'Corte Premium + Barba',
+            'url' => url('/')
+        ], function ($message) use ($request) {
             $message->to($request->email)
                     ->subject('Prueba de Correos CodexBarber');
         });
-        return "¡Correo enviado con éxito a {$request->email}! Revisa tu bandeja de entrada o la carpeta de Spam.";
+        return "¡Correo con diseño enviado con éxito a {$request->email}!";
     } catch (\Exception $e) {
         return "Hubo un error al enviar el correo. Revisa el archivo .env. Error exacto: " . $e->getMessage();
     }

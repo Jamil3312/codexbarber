@@ -47,16 +47,19 @@ class AppointmentReminder extends Notification
     {
         $barbershopName = $this->appointment->barbershop->name ?? 'Nuestra Barbería';
         $time = Carbon::parse($this->appointment->start_time)->format('h:i A');
+        $clientName = $this->appointment->user->name ?? $this->appointment->walkin_name ?? 'Cliente';
+        $serviceName = $this->appointment->service->name ?? 'Cita General';
+        $url = url("/b/" . ($this->appointment->barbershop->slug ?? ''));
 
         return (new MailMessage)
                     ->subject("Recordatorio: Tu cita es hoy a las {$time}")
-                    ->greeting("¡Hola " . ($this->appointment->user->name ?? $this->appointment->walkin_name) . "!")
-                    ->line("Te recordamos que tienes una cita programada para hoy en **{$barbershopName}**.")
-                    ->line("**Hora:** {$time}")
-                    ->line("**Servicio:** " . ($this->appointment->service->name ?? 'Cita General'))
-                    ->line("Te pedimos amablemente llegar con 5 minutos de anticipación para brindarte el mejor servicio posible.")
-                    ->action('Ver Detalles de la Cita', url("/b/" . ($this->appointment->barbershop->slug ?? '')))
-                    ->line('¡Te esperamos!');
+                    ->view('emails.appointment_reminder', [
+                        'barbershopName' => $barbershopName,
+                        'time' => $time,
+                        'clientName' => $clientName,
+                        'serviceName' => $serviceName,
+                        'url' => $url
+                    ]);
     }
 
     /**
