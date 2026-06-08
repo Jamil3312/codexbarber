@@ -59,7 +59,7 @@
     <body class="antialiased bg-gray-950 text-gray-100 font-sans selection:bg-yellow-500 selection:text-gray-900">
         
         <!-- Hero Section -->
-        <main class="relative bg-gray-900 overflow-hidden min-h-screen flex flex-col justify-center">
+        <main class="relative bg-gray-900 overflow-hidden min-h-screen flex flex-col">
             <div class="absolute inset-0">
                 <div class="absolute inset-0 bg-gray-950 mix-blend-multiply opacity-80 z-10" aria-hidden="true"></div>
                 <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=2000" alt="Barbershop Background" class="w-full h-full object-cover grayscale opacity-40">
@@ -67,7 +67,7 @@
             </div>
 
             <!-- Top Navbar -->
-            <nav class="absolute top-0 left-0 right-0 z-50 flex flex-col md:flex-row justify-between items-center p-6 lg:px-12 gap-4">
+            <nav class="relative w-full z-50 flex flex-col md:flex-row justify-between items-center p-6 lg:px-12 gap-4 shrink-0">
                 <div class="hidden md:block md:w-1/3"></div>
                 
                 <div class="flex items-center justify-center gap-3 w-full md:w-1/3 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
@@ -118,7 +118,7 @@
                 </div>
             </nav>
 
-            <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center mt-20">
+            <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center text-center flex-1 py-10 w-full">
                 <span class="inline-block py-1 px-3 rounded-full bg-gray-800/80 border border-gray-700 text-primary-dynamic font-semibold text-sm tracking-widest mb-6 backdrop-blur" style="color: var(--primary-color)">EXCELENCIA Y PRECISIÓN</span>
                 <h1 class="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight mb-8 leading-tight">
                     Tu estilo en <br/> <span class="text-transparent bg-clip-text" style="background-image: linear-gradient(to right, #fff, var(--primary-color), #fff)">manos de expertos.</span>
