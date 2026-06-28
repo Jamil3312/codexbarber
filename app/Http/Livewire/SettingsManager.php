@@ -13,6 +13,7 @@ class SettingsManager extends Component
     public $start_time_2;
     public $end_time_2;
     public $cancellation_notice;
+    public $buffer_time;
 
     public function mount()
     {
@@ -24,6 +25,7 @@ class SettingsManager extends Component
             $this->start_time_2 = $setting->start_time_2 ? \Carbon\Carbon::parse($setting->start_time_2)->format('H:i') : null;
             $this->end_time_2 = $setting->end_time_2 ? \Carbon\Carbon::parse($setting->end_time_2)->format('H:i') : null;
             $this->cancellation_notice = $setting->cancellation_notice;
+            $this->buffer_time = $setting->buffer_time ?? 0;
         }
     }
 
@@ -36,6 +38,7 @@ class SettingsManager extends Component
             'start_time_2' => 'nullable|date_format:H:i',
             'end_time_2' => 'nullable|date_format:H:i|after:start_time_2',
             'cancellation_notice' => 'required|integer|min:0',
+            'buffer_time' => 'required|integer|min:0|max:60',
         ], [
             'end_time_1.after' => 'El fin del turno 1 debe ser después del inicio.',
             'end_time_2.after' => 'El fin del turno 2 debe ser después de su inicio.'
@@ -50,6 +53,7 @@ class SettingsManager extends Component
         $setting->start_time_2 = $this->start_time_2;
         $setting->end_time_2 = $this->end_time_2;
         $setting->cancellation_notice = $this->cancellation_notice;
+        $setting->buffer_time = $this->buffer_time;
         
         $setting->save();
 

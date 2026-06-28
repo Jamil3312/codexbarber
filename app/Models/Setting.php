@@ -17,6 +17,7 @@ class Setting extends Model
         'end_time_2',
         'cancellation_notice',
         'barbershop_id',
+        'buffer_time',
     ];
 
     public function barbershop()

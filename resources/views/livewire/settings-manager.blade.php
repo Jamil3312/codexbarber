@@ -64,6 +64,13 @@
                 @error('cancellation_notice') <span class="text-red-400 text-sm mt-1 block">{{ $message }}</span> @enderror
             </div>
 
+            <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700">
+                <label class="block text-sm font-semibold text-gray-300 mb-2">Tiempo de Descanso entre Citas (minutos)</label>
+                <input type="number" wire:model="buffer_time" class="w-full bg-gray-900 border border-gray-600 text-white rounded-xl focus:ring-yellow-500 focus:border-yellow-500 p-3 shadow-inner">
+                <p class="text-xs text-gray-500 mt-2">Descanso obligatorio después de cada cita antes de permitir la siguiente (Ej: 10 o 15 minutos). Deja en 0 para citas consecutivas.</p>
+                @error('buffer_time') <span class="text-red-400 text-sm mt-1 block">{{ $message }}</span> @enderror
+            </div>
+
             <button type="submit" class="w-full relative group overflow-hidden bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-lg py-4 rounded-2xl shadow-[0_5px_15px_rgba(234,179,8,0.3)] transition-all duration-300">
                 <span class="relative z-10 flex justify-center items-center gap-2">
                     Guardar Configuración

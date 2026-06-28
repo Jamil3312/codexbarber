@@ -141,6 +141,7 @@ class BookAppointment extends Component
         $duration = $service->duration_minutes;
         $gridInterval = $setting->slot_duration ?? 30; // Grid resolution fallback
         $noticeMinutes = 15;
+        $bufferTime = $setting->buffer_time ?? 0;
 
         // 1. Obtener citas agendadas primero para inyectar sus horarios de finalización
         $bookedAppointments = Appointment::where('date', $this->selectedDate)
@@ -155,12 +156,12 @@ class BookAppointment extends Component
 
         // Generar turno 1 (mañana) solo si no está bloqueado
         if (!$morningBlocked) {
-            $this->generateSlotsForShift($setting->start_time_1, $setting->end_time_1, $gridInterval, $duration, $bookedAppointments);
+            $this->generateSlotsForShift($setting->start_time_1, $setting->end_time_1, $gridInterval, $duration, $bookedAppointments, $bufferTime);
         }
 
         // Generar turno 2 (tarde) solo si existe y no está bloqueado
         if (!$afternoonBlocked && $setting->start_time_2 && $setting->end_time_2) {
-            $this->generateSlotsForShift($setting->start_time_2, $setting->end_time_2, $gridInterval, $duration, $bookedAppointments);
+            $this->generateSlotsForShift($setting->start_time_2, $setting->end_time_2, $gridInterval, $duration, $bookedAppointments, $bufferTime);
         }
 
         // Si ambos turnos están bloqueados, mostrar como cerrado
@@ -181,7 +182,7 @@ class BookAppointment extends Component
         $minTime = $now->copy()->addMinutes($noticeMinutes);
 
         // 3. Filtrar colisiones y horarios pasados
-        $this->availableSlots = array_values(array_filter($this->availableSlots, function($slot) use ($bookedAppointments, $minTime, $isToday, $duration) {
+        $this->availableSlots = array_values(array_filter($this->availableSlots, function($slot) use ($bookedAppointments, $minTime, $isToday, $duration, $bufferTime) {
             $slotStart = Carbon::parse($this->selectedDate . ' ' . $slot);
             $slotEnd = $slotStart->copy()->addMinutes($duration);
 
@@ -190,9 +191,32 @@ class BookAppointment extends Component
             foreach($bookedAppointments as $booked) {
                 $bookedStart = Carbon::parse($booked->date . ' ' . $booked->start_time);
                 $bookedEnd = Carbon::parse($booked->date . ' ' . $booked->end_time);
+                $bookedEndWithBuffer = $bookedEnd->copy()->addMinutes($bufferTime);
 
-                if ($slotStart->lessThan($bookedEnd) && $bookedStart->lessThan($slotEnd)) {
+                // 3.1 Colisión directa (incluyendo buffer)
+                if ($slotStart->lessThan($bookedEndWithBuffer) && $bookedStart->lessThan($slotEnd)) {
                     return false;
+                }
+
+                // Definir un tiempo mínimo de servicio para considerar un punto muerto (ej. 15 mins)
+                $minServiceTime = 15;
+
+                // 3.2 Regla contra Puntos Muertos a la izquierda
+                if ($slotStart->greaterThan($bookedEndWithBuffer)) {
+                    $gapAfter = $slotStart->diffInMinutes($bookedEndWithBuffer);
+                    // Si el hueco es menor al servicio mínimo (15 min), no se puede aprovechar, es punto muerto.
+                    if ($gapAfter > 0 && $gapAfter < $minServiceTime) {
+                        return false;
+                    }
+                }
+
+                // 3.3 Regla contra Puntos Muertos a la derecha
+                $slotEndWithBuffer = $slotEnd->copy()->addMinutes($bufferTime);
+                if ($bookedStart->greaterThan($slotEndWithBuffer)) {
+                    $gapBefore = $bookedStart->diffInMinutes($slotEndWithBuffer);
+                    if ($gapBefore > 0 && $gapBefore < $minServiceTime) {
+                        return false;
+                    }
                 }
             }
 
@@ -200,12 +224,12 @@ class BookAppointment extends Component
         }));
     }
 
-    private function generateSlotsForShift($start, $end, $gridInterval, $serviceDuration, $bookedAppointments)
+    private function generateSlotsForShift($start, $end, $gridInterval, $serviceDuration, $bookedAppointments, $bufferTime = 0)
     {
         if (!$start || !$end) return;
         
         $startTime = Carbon::parse($start);
-        $endTime = Carbon::parse($end)->addMinutes(10); // +10 minutos de tolerancia (salida flexible)
+        $endTime = Carbon::parse($end);
 
         // A. Cuadrícula Fija
         $current = $startTime->copy();
@@ -214,11 +238,11 @@ class BookAppointment extends Component
             $current->addMinutes($gridInterval);
         }
 
-        // B. Horarios Dinámicos (Inyección desde end_time)
+        // B. Horarios Dinámicos (Inyección desde end_time + buffer)
         foreach ($bookedAppointments as $booked) {
-            $bookedEnd = Carbon::parse($booked->end_time);
+            $bookedEnd = Carbon::parse($booked->end_time)->addMinutes($bufferTime);
             
-            // Si el servicio nuevo entra perfectamente después de la cita y no excede la tolerancia del turno
+            // Si el servicio nuevo entra perfectamente después de la cita
             if ($bookedEnd->greaterThanOrEqualTo($startTime) && $bookedEnd->copy()->addMinutes($serviceDuration)->lessThanOrEqualTo($endTime)) {
                 $this->availableSlots[] = $bookedEnd->format('H:i');
             }
@@ -265,15 +289,43 @@ class BookAppointment extends Component
             $slotStart = Carbon::parse($currentDate . ' ' . $this->selectedTime);
             $slotEnd = $slotStart->copy()->addMinutes($duration);
             
-            // Verificar solapamiento
+            // Obtener configuración de buffer para esta barbería
+            $setting = Setting::where('barbershop_id', $barbershopId)->first();
+            $bufferTime = $setting->buffer_time ?? 0;
+
+            // Verificar solapamiento (incluyendo buffer) y regla de puntos muertos
             $overlap = Appointment::where('date', $currentDate)
                 ->where('status', 'scheduled')
                 ->where('barber_id', $this->selectedBarberId)
                 ->get()
-                ->contains(function($booked) use ($slotStart, $slotEnd) {
+                ->contains(function($booked) use ($slotStart, $slotEnd, $bufferTime, $duration) {
                     $bookedStart = Carbon::parse($booked->date . ' ' . $booked->start_time);
                     $bookedEnd = Carbon::parse($booked->date . ' ' . $booked->end_time);
-                    return $slotStart->lessThan($bookedEnd) && $bookedStart->lessThan($slotEnd);
+                    $bookedEndWithBuffer = $bookedEnd->copy()->addMinutes($bufferTime);
+
+                    // 1. Colisión directa (incluyendo buffer)
+                    if ($slotStart->lessThan($bookedEndWithBuffer) && $bookedStart->lessThan($slotEnd)) {
+                        return true;
+                    }
+
+                    // 2. Punto muerto a la izquierda
+                    if ($slotStart->greaterThan($bookedEndWithBuffer)) {
+                        $gapAfter = $slotStart->diffInMinutes($bookedEndWithBuffer);
+                        if ($gapAfter > 0 && $gapAfter < $duration) {
+                            return true;
+                        }
+                    }
+
+                    // 3. Punto muerto a la derecha
+                    $slotEndWithBuffer = $slotEnd->copy()->addMinutes($bufferTime);
+                    if ($bookedStart->greaterThan($slotEndWithBuffer)) {
+                        $gapBefore = $bookedStart->diffInMinutes($slotEndWithBuffer);
+                        if ($gapBefore > 0 && $gapBefore < $duration) {
+                            return true;
+                        }
+                    }
+
+                    return false;
                 });
                 
             // Verificar bloqueos del día completo
@@ -284,7 +336,7 @@ class BookAppointment extends Component
             
             if ($overlap || $fullBlock) {
                 $formattedDate = Carbon::parse($currentDate)->translatedFormat('l d \d\e F');
-                session()->flash('error', "Conflicto el $formattedDate. Ese horario ya fue reservado o la barbería está cerrada. Por favor selecciona otro o desactiva la repetición.");
+                session()->flash('error', "Conflicto el $formattedDate. Ese horario ya fue reservado o la barbería está cerrada o deja un tiempo muerto inapropiado. Por favor selecciona otro o desactiva la repetición.");
                 $this->loadSlots();
                 return;
             }
