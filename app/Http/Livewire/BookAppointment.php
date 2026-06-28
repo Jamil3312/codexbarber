@@ -198,13 +198,15 @@ class BookAppointment extends Component
                     return false;
                 }
 
-                // Definir un tiempo mínimo de servicio para considerar un punto muerto (ej. 15 mins)
-                $minServiceTime = 15;
+                // Definir un tiempo mínimo de servicio para considerar un punto muerto.
+                // Usamos la duración del servicio actual para forzar a que no queden huecos
+                // menores al tiempo que toma el servicio que el cliente quiere reservar.
+                $minServiceTime = $duration;
 
                 // 3.2 Regla contra Puntos Muertos a la izquierda
                 if ($slotStart->greaterThan($bookedEndWithBuffer)) {
                     $gapAfter = $slotStart->diffInMinutes($bookedEndWithBuffer);
-                    // Si el hueco es menor al servicio mínimo (15 min), no se puede aprovechar, es punto muerto.
+                    // Si el hueco es menor al servicio mínimo, no se puede aprovechar, es punto muerto.
                     if ($gapAfter > 0 && $gapAfter < $minServiceTime) {
                         return false;
                     }
