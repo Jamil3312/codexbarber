@@ -71,6 +71,37 @@
                 @error('buffer_time') <span class="text-red-400 text-sm mt-1 block">{{ $message }}</span> @enderror
             </div>
 
+            <!-- Días de descanso por Barbero -->
+            <div class="bg-gray-800 p-5 rounded-2xl border border-gray-700">
+                <h3 class="font-bold text-gray-300 mb-4 border-b border-gray-700 pb-2">Días de Descanso (Días Libres)</h3>
+                <p class="text-xs text-gray-400 mb-4">Selecciona los días de la semana en que cada persona no atiende, y el motivo (ej. "Día familiar").</p>
+                
+                <div class="space-y-6">
+                    @foreach($barbers as $barber)
+                        <div class="bg-gray-900 p-4 rounded-xl border border-gray-750">
+                            <h4 class="font-bold text-yellow-500 mb-3">{{ $barber->name }}</h4>
+                            
+                            <div class="flex flex-wrap gap-3 mb-4">
+                                @php
+                                    $days = [1 => 'Lun', 2 => 'Mar', 3 => 'Mié', 4 => 'Jue', 5 => 'Vie', 6 => 'Sáb', 0 => 'Dom'];
+                                @endphp
+                                @foreach($days as $val => $label)
+                                    <label class="flex items-center gap-2 cursor-pointer bg-gray-800 px-3 py-2 rounded-lg border border-gray-700 hover:border-yellow-500 transition-colors">
+                                        <input type="checkbox" wire:model="barberSchedules.{{ $barber->id }}.days_off" value="{{ $val }}" class="text-yellow-500 bg-gray-900 border-gray-600 rounded focus:ring-yellow-500 focus:ring-offset-gray-900">
+                                        <span class="text-sm font-semibold text-gray-300">{{ $label }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Motivo (Mensaje que verá el cliente)</label>
+                                <input type="text" wire:model.defer="barberSchedules.{{ $barber->id }}.day_off_reason" placeholder="Ej. Día de descanso" class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-yellow-500 focus:border-yellow-500 p-2 text-sm shadow-inner">
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
             <button type="submit" class="w-full relative group overflow-hidden bg-yellow-500 hover:bg-yellow-400 text-gray-900 font-bold text-lg py-4 rounded-2xl shadow-[0_5px_15px_rgba(234,179,8,0.3)] transition-all duration-300">
                 <span class="relative z-10 flex justify-center items-center gap-2">
                     Guardar Configuración

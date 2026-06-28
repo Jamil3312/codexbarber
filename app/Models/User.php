@@ -26,6 +26,8 @@ class User extends Authenticatable
         'is_owner',
         'is_superadmin',
         'barbershop_id',
+        'days_off',
+        'day_off_reason',
     ];
 
     /**
@@ -45,6 +47,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'days_off' => 'array',
     ];
 
     public function appointments()

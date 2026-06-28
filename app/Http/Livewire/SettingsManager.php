@@ -14,6 +14,9 @@ class SettingsManager extends Component
     public $end_time_2;
     public $cancellation_notice;
     public $buffer_time;
+    
+    public $barbers = [];
+    public $barberSchedules = [];
 
     public function mount()
     {
@@ -26,6 +29,17 @@ class SettingsManager extends Component
             $this->end_time_2 = $setting->end_time_2 ? \Carbon\Carbon::parse($setting->end_time_2)->format('H:i') : null;
             $this->cancellation_notice = $setting->cancellation_notice;
             $this->buffer_time = $setting->buffer_time ?? 0;
+        }
+
+        $this->barbers = \App\Models\User::where('barbershop_id', auth()->user()->barbershop_id)
+            ->where('is_barber', true)
+            ->get();
+
+        foreach ($this->barbers as $barber) {
+            $this->barberSchedules[$barber->id] = [
+                'days_off' => $barber->days_off ?? [],
+                'day_off_reason' => $barber->day_off_reason ?? '',
+            ];
         }
     }
 
@@ -56,6 +70,26 @@ class SettingsManager extends Component
         $setting->buffer_time = $this->buffer_time;
         
         $setting->save();
+
+        foreach ($this->barberSchedules as $barberId => $data) {
+            $barber = \App\Models\User::where('id', $barberId)
+                ->where('barbershop_id', auth()->user()->barbershop_id)
+                ->first();
+                
+            if ($barber) {
+                // Handle livewire checkbox arrays properly
+                $daysOff = is_array($data['days_off']) ? array_filter(array_map(function($val) {
+                    return is_numeric($val) || is_bool($val) && $val ? (int)$val : null;
+                }, $data['days_off']), function($val) { return $val !== null && $val !== false; }) : [];
+                
+                // If Livewire binds `days_off` as [0 => true, 1 => false], the keys are the actual days.
+                // If it binds as an array of values `['0', '1']`, the values are the actual days.
+                // To be safe, if we use `<input type="checkbox" wire:model="...days_off" value="0">`, Livewire puts the string values in the array.
+                $barber->days_off = array_values(array_map('intval', is_array($data['days_off']) ? $data['days_off'] : []));
+                $barber->day_off_reason = $data['day_off_reason'] ?? null;
+                $barber->save();
+            }
+        }
 
         session()->flash('message', 'Configuración de horarios guardada exitosamente.');
     }

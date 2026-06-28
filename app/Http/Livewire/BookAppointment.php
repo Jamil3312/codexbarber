@@ -120,6 +120,14 @@ class BookAppointment extends Component
         $setting = Setting::where('barbershop_id', auth()->user()->barbershop_id)->first();
         if (!$setting || !$this->selectedServiceId || !$this->selectedBarberId) return;
 
+        $barber = User::find($this->selectedBarberId);
+        if ($barber && is_array($barber->days_off) && in_array(\Carbon\Carbon::parse($this->selectedDate)->dayOfWeek, $barber->days_off)) {
+            $this->isDayBlocked = true;
+            $this->blockReason = $barber->day_off_reason ?: 'El barbero no atiende este día.';
+            $this->availableSlots = [];
+            return;
+        }
+
         // Verificar bloqueos del día (puede haber varios: morning + afternoon)
         // OJO: Idealmente BlockedDay también debería tener barber_id en el futuro.
         // Por ahora lo dejamos a nivel de barbería para simplificar MVP, o podrías filtrar por barber_id si existe.
