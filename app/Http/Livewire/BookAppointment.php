@@ -205,29 +205,6 @@ class BookAppointment extends Component
                 if ($slotStart->lessThan($bookedEndWithBuffer) && $bookedStart->lessThan($slotEnd)) {
                     return false;
                 }
-
-                // Definir un tiempo mínimo de servicio para considerar un punto muerto.
-                // Usamos la duración del servicio actual para forzar a que no queden huecos
-                // menores al tiempo que toma el servicio que el cliente quiere reservar.
-                $minServiceTime = $duration;
-
-                // 3.2 Regla contra Puntos Muertos a la izquierda
-                if ($slotStart->greaterThan($bookedEndWithBuffer)) {
-                    $gapAfter = $slotStart->diffInMinutes($bookedEndWithBuffer);
-                    // Si el hueco es menor al servicio mínimo, no se puede aprovechar, es punto muerto.
-                    if ($gapAfter > 0 && $gapAfter < $minServiceTime) {
-                        return false;
-                    }
-                }
-
-                // 3.3 Regla contra Puntos Muertos a la derecha
-                $slotEndWithBuffer = $slotEnd->copy()->addMinutes($bufferTime);
-                if ($bookedStart->greaterThan($slotEndWithBuffer)) {
-                    $gapBefore = $bookedStart->diffInMinutes($slotEndWithBuffer);
-                    if ($gapBefore > 0 && $gapBefore < $minServiceTime) {
-                        return false;
-                    }
-                }
             }
 
             return true;
@@ -313,29 +290,8 @@ class BookAppointment extends Component
                     $bookedEnd = Carbon::parse($booked->date . ' ' . $booked->end_time);
                     $bookedEndWithBuffer = $bookedEnd->copy()->addMinutes($bufferTime);
 
-                    // 1. Colisión directa (incluyendo buffer)
-                    if ($slotStart->lessThan($bookedEndWithBuffer) && $bookedStart->lessThan($slotEnd)) {
-                        return true;
-                    }
-
-                    // 2. Punto muerto a la izquierda
-                    if ($slotStart->greaterThan($bookedEndWithBuffer)) {
-                        $gapAfter = $slotStart->diffInMinutes($bookedEndWithBuffer);
-                        if ($gapAfter > 0 && $gapAfter < $duration) {
-                            return true;
-                        }
-                    }
-
-                    // 3. Punto muerto a la derecha
-                    $slotEndWithBuffer = $slotEnd->copy()->addMinutes($bufferTime);
-                    if ($bookedStart->greaterThan($slotEndWithBuffer)) {
-                        $gapBefore = $bookedStart->diffInMinutes($slotEndWithBuffer);
-                        if ($gapBefore > 0 && $gapBefore < $duration) {
-                            return true;
-                        }
-                    }
-
-                    return false;
+                    // Colisión directa (incluyendo buffer)
+                    return ($slotStart->lessThan($bookedEndWithBuffer) && $bookedStart->lessThan($slotEnd));
                 });
                 
             // Verificar bloqueos del día completo
