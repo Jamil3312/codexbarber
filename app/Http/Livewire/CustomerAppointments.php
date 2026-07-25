@@ -40,10 +40,8 @@ class CustomerAppointments extends Component
 
         $appt->update(['status' => 'cancelled']);
 
-        // Notificar al barbero de la barbería
-        $barber = User::where('is_barber', true)
-            ->where('barbershop_id', auth()->user()->barbershop_id)
-            ->first();
+        // Notificar al barbero asignado a esta cita
+        $barber = User::find($appt->barber_id);
 
         if ($barber) {
             $barber->notify(new AppointmentCancelledByCustomer($appt));
